@@ -1,47 +1,46 @@
 package org.unewe.Exercise_1;
 
-import java.util.ArrayList;
+import java.net.InetAddress;
+import java.util.LinkedList;
 
 public class IpWriter 
 {
-	
-	public static ArrayList<String> write(String[] args)
-    {
-		int[] firstIP = new int[4];
-		int[] secondIP = new int[4];
-		ArrayList<String> result = new ArrayList<String>();
+	//Returns the linked list of strings(ip)  between low and high ip's
+	public static LinkedList<String> write(InetAddress low, InetAddress high) {
 		
-        fill(firstIP, args[0]);
-        fill(secondIP, args[1]);
-        
-        //перебор всех возможный ip адресов в заданом диапазоне
-       for(int a = firstIP[0]; a <= secondIP[0]; a++) {
-    	   for(int b = firstIP[1]; b <= secondIP[1]; b++) {
-    		   for(int c = firstIP[2]; c <= secondIP[2]; c++) {
-    			   for(int d = firstIP[3] + 1; d < secondIP[3]; d++) {
-    				   result.add(a + "." + b + "." + c + "." + d);
-    			   }
-    		   }
-    	   }
-        }
-        
+		byte[] ipLow = low.getAddress();
+		byte[] ipHigh = high.getAddress();
+		
+		long ipLowLong = ipToLong(ipLow);
+		long ipHighLong = ipToLong(ipHigh);
+		
+		LinkedList<String> result = new LinkedList<String>();
+		
+		for(long l = ipLowLong + 1; l < ipHighLong; l++) {
+			result.add(IpWriter.ipToString(l));
+		}
         return result;
     }
 	
-	
-	private static void fill(int[] array, String ip) {
-		ip += ".";
-		int temp = -1;
-		try {
-			
-			for(int i = 0; i < 4; i++) {
-				array[i] =Integer.valueOf(ip.substring(temp + 1,temp = ip.indexOf(".", temp + 1)));
-			}
-		} catch(NumberFormatException e) {
-			System.err.println("Введены некорректные ip адреса.");
-			Main.main(new String[0] );
-		}
+	//convert byte array to long value
+	private static long ipToLong(byte[] ip) {
 		
+		long longIP = 0;
+		for(byte b : ip) {
+			longIP <<= 8;
+			longIP |= b & 0xff;
+		}
+		return longIP;
 	}
 	
+	//convert long value to string(ip)
+	private static String ipToString(long l) {
+		int[] ip = new int[4];
+		for(int i = 3; i >= 0; i--) {
+			byte b = 0;
+			ip[i] = (b |= l) & 0xff;
+			l >>= 8;
+		}
+		return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
+	}
 }
